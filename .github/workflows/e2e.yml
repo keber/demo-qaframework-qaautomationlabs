@@ -11,6 +11,7 @@ on:
 # Least privilege: only contents:write is needed, to push the report to gh-pages.
 permissions:
   contents: write
+  pages: read
 
 concurrency:
   group: e2e-playwright
@@ -95,8 +96,9 @@ jobs:
           git commit -q -m "docs: publish playwright report (run ${GITHUB_RUN_ID})"
           # The branch only ever holds the latest report, so it is replaced on every run.
           git push -q -f "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:${PAGES_BRANCH}"
-          OWNER="${GITHUB_REPOSITORY%%/*}"; REPO="${GITHUB_REPOSITORY#*/}"
-          echo "### Playwright report: https://${OWNER,,}.github.io/${REPO}/" >> "$GITHUB_STEP_SUMMARY"
+          # Pages may use a custom domain, so ask the API instead of building the URL.
+          URL=$(GH_TOKEN="$GITHUB_TOKEN" gh api "repos/${GITHUB_REPOSITORY}/pages" -q .html_url 2>/dev/null || true)
+          echo "### Playwright report: ${URL:-GitHub Pages is not enabled for this repository yet}" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Fail job if tests failed
         if: steps.tests.outcome == 'failure'
