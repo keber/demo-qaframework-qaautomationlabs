@@ -1,0 +1,105 @@
+name: E2E Playwright (on demand)
+
+on:
+  workflow_dispatch:
+    inputs:
+      workers:
+        description: "Playwright workers (1-8)"
+        required: false
+        default: "4"
+
+# Least privilege: only contents:write is needed, to push the report to gh-pages.
+permissions:
+  contents: write
+
+concurrency:
+  group: e2e-playwright
+  cancel-in-progress: false
+
+env:
+  E2E_DIR: qa/07-automation/e2e
+  REPORT_DIR: qa/05-test-execution/automated/html-report
+  PAGES_BRANCH: gh-pages
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate inputs and secrets
+        env:
+          WORKERS: ${{ inputs.workers }}
+          QA_USER_EMAIL: ${{ secrets.QA_USER_EMAIL }}
+          QA_USER_PASSWORD: ${{ secrets.QA_USER_PASSWORD }}
+        run: |
+          [[ "$WORKERS" =~ ^[1-8]$ ]] || { echo "::error::workers must be an integer between 1 and 8"; exit 1; }
+          [[ -n "$QA_USER_EMAIL" && -n "$QA_USER_PASSWORD" ]] || { echo "::error::Secrets QA_USER_EMAIL and QA_USER_PASSWORD are required"; exit 1; }
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: ${{ env.E2E_DIR }}/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ${{ env.E2E_DIR }}
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+
+      - name: Run Playwright suite
+        id: tests
+        continue-on-error: true
+        working-directory: ${{ env.E2E_DIR }}
+        env:
+          CI: "true"
+          QA_LANE_ONLY: "1"
+          QA_BASE_URL: https://shop.qaautomationlabs.com
+          QA_LOGIN_PATH: /index.php
+          QA_USER_EMAIL: ${{ secrets.QA_USER_EMAIL }}
+          QA_USER_PASSWORD: ${{ secrets.QA_USER_PASSWORD }}
+          WORKERS: ${{ inputs.workers }}
+        run: npx playwright test --project=chromium --project=login-flow --workers="$WORKERS"
+
+      - name: Upload report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ github.run_id }}
+          path: |
+            ${{ env.REPORT_DIR }}
+            qa/05-test-execution/automated/results.json
+          retention-days: 14
+          if-no-files-found: warn
+
+      - name: Publish report to GitHub Pages branch
+        if: always() && steps.tests.outcome != 'skipped'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          [[ -f "$REPORT_DIR/index.html" ]] || { echo "::error::HTML report not found in $REPORT_DIR"; exit 1; }
+          SITE="$RUNNER_TEMP/site"
+          rm -rf "$SITE" && mkdir -p "$SITE"
+          cp -R "$REPORT_DIR/." "$SITE/"
+          touch "$SITE/.nojekyll"
+          cd "$SITE"
+          git init -q -b "$PAGES_BRANCH"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "docs: publish playwright report (run ${GITHUB_RUN_ID})"
+          # The branch only ever holds the latest report, so it is replaced on every run.
+          git push -q -f "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:${PAGES_BRANCH}"
+          OWNER="${GITHUB_REPOSITORY%%/*}"; REPO="${GITHUB_REPOSITORY#*/}"
+          echo "### Playwright report: https://${OWNER,,}.github.io/${REPO}/" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Fail job if tests failed
+        if: steps.tests.outcome == 'failure'
+        run: |
+          echo "::error::Playwright suite has unexpected failures. See the published report."
+          exit 1
