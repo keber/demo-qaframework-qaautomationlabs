@@ -10,15 +10,15 @@
 
 | Module | Submodule | TCs Total | TCs Automated | Plan | ADO Suite | Status | Last Run |
 |---|---|---|---|---|---|---|---|
-| auth | LOGIN | 19 | 0 | ✅ | - | ⚠️ Etapas 1-4 completas; automatización pendiente | - |
-| auth | SES | 12 | 0 | ✅ | - | ⚠️ Etapas 1-4 completas; automatización pendiente | - |
-| catalog | SHOP | 10 | 0 | ✅ | - | ⚠️ Etapas 1-4 completas; automatización pendiente | - |
-| catalog | LIST | 20 | 0 | ✅ | - | ⚠️ Etapas 1-4 completas; automatización pendiente | - |
-| catalog | DETAIL | 8 | 0 | ✅ | - | ⚠️ Etapas 1-4 completas; automatización pendiente | - |
-| catalog | BADGE | 12 | 0 | ✅ | - | ⚠️ Etapas 1-4 completas; automatización pendiente | - |
-| cart | GEST | 18 | 0 | ✅ | - | ⚠️ Etapas 1-4 completas; automatización pendiente | - |
-| cart | CHK | 20 | 0 | ✅ | - | ⚠️ Etapas 1-4 completas; automatización pendiente | - |
-| **Total** | | **119** | **0** | | | | |
+| auth | LOGIN | 19 | 19 | ✅ | - | ✅ Etapas 1-5b completas (19 pasan) | 2026-11-20 |
+| auth | SES | 12 | 12 | ✅ | - | ✅ Etapas 1-5b completas (10 pasan, 2 `test.fail()`: DEF-001, DEF-002) | 2026-11-20 |
+| catalog | SHOP | 10 | 10 | ✅ | - | ✅ Etapas 1-5b completas (10 pasan) | 2026-11-20 |
+| catalog | LIST | 20 | 20 | ✅ | - | ✅ Etapas 1-5b completas (20 pasan) | 2026-11-20 |
+| catalog | DETAIL | 8 | 8 | ✅ | - | ✅ Etapas 1-5b completas (8 pasan) | 2026-11-20 |
+| catalog | BADGE | 12 | 12 | ✅ | - | ✅ Etapas 1-5b completas (12 pasan) | 2026-11-20 |
+| cart | GEST | 18 | 18 | ✅ | - | ✅ Etapas 1-5b completas (17 pasan, 1 `test.fail()`: DEF-003) | 2026-11-20 |
+| cart | CHK | 20 | 20 | ✅ | - | ✅ Etapas 1-5b completas (17 pasan, 3 `test.fail()`: DEF-004, DEF-005) | 2026-11-20 |
+| **Total** | | **119** | **119** | | | **113 pasan, 6 `test.fail()`** | |
 
 **Legend**: ✅ Done · ⚠️ Partial · 🔲 Not started · ⛔ Blocked
 
@@ -60,24 +60,33 @@ Corrida final (2026-11-20, Chromium, Playwright 1.65.1): 119 TCs, 113 pasados, 6
 ## Quick-Start Commands
 
 ```bash
-# Run all automated tests
-cd qa/07-automation
-npx playwright test
+# Instalación (una vez)
+cd qa/07-automation/e2e
+npm install
+npx playwright install chromium
 
-# Run a specific module
-npx playwright test tests/{module-folder}/
+# Variables de entorno (o en qa/07-automation/e2e/.env, copiado de .env.example y excluido de git)
+export QA_BASE_URL=https://shop.qaautomationlabs.com
+export QA_LOGIN_PATH=/index.php
+export QA_USER_EMAIL=<PLACEHOLDER>
+export QA_USER_PASSWORD=<PLACEHOLDER>
 
-# Run with UI (debug mode)
-npx playwright test --ui
+# Suite completa (119 TCs), tal como se ejecutó la corrida final
+QA_LANE_ONLY=1 npx playwright test --project=chromium --project=login-flow --workers=4
 
-# Generate HTML report
-npx playwright show-report
+# Un módulo concreto
+QA_LANE_ONLY=1 npx playwright test tests/cart/ --project=chromium --project=login-flow
 
-# Re-run only failed tests
-npx playwright test --last-failed
+# Abrir el informe HTML (se genera en qa/05-test-execution/automated/html-report)
+npx playwright show-report ../../05-test-execution/automated/html-report
 ```
 
-> Set credentials in `qa/07-automation/.env` (copy from `.env.example`).
+> En Git Bash para Windows, anteponga `MSYS_NO_PATHCONV=1` al comando para que `/index.php` no se
+> convierta en una ruta de Windows. `QA_LANE_ONLY=1` fija la corrida al carril 1 (`QA_USER`) de
+> `parallelLanes` en `qa/qa-framework.config.json`.
+>
+> CI: el workflow `.github/workflows/e2e.yml` ejecuta la suite bajo demanda (`workflow_dispatch`) y
+> publica el informe HTML de Playwright en GitHub Pages.
 
 ---
 
@@ -93,47 +102,42 @@ npx playwright test --last-failed
 
 | Suite | Date | Pass | Fail | Skip | CI Link |
 |---|---|---|---|---|---|
-| E2E | - | - | - | - | - |
-| API | - | - | - | - | - |
+| E2E | 2026-11-20 | 113 (+6 `test.fail()` esperados) | 0 | 0 | Local: `qa/05-test-execution/automated/results.json` |
 
-> Update this table after each significant run. The CI Link can be an ADO TestRun URL, a
-> GitHub Actions run URL, or a path to a local report file.
+> Sin suite API: el proyecto no usa pruebas de integración API (`qa/07-automation/integration/`).
 
 ## Last Execution
 
 | Date | Suite | Pass | Skip | Fail | Duration | Report |
 |---|---|---|---|---|---|---|
-| - | - | - | - | - | - | - |
+| 2026-11-20 | E2E Chromium (`chromium` + `login-flow`, 4 workers) | 113 + 6 esperados | 0 | 0 | 1 min 55 s (114,9 s) | `qa/05-test-execution/automated/html-report/`, `qa/05-test-execution/automated/STABILIZATION-REPORT-2026-11-20.md` |
 
 ## Flaky Tests
 
-> Mark known flaky tests with this inline annotation directly in the table or spec file.
-> Format: `[flaky] <test-id-or-name> - <root cause> - last seen <YYYY-MM-DD>`
->
-> Example:
-> `[flaky] TC-MOD-012 - timing issue on slow CI agents - last seen 2026-01-15`
->
-> Remove the annotation once the test has been stable for 2+ consecutive CI runs.
+Ninguno. La estabilización (Etapa 5b) ejecutó dos corridas completas adicionales más la corrida
+final: 0 fallos inesperados y 0 tests flaky en las tres.
+
+> Formato si aparece uno: `[flaky] <test-id> - <causa raíz> - last seen <YYYY-MM-DD>`. Retirar la
+> anotación tras 2 o más corridas de CI estables consecutivas.
 
 ---
 
 ## Sprint History
 
-<!-- Completed sprint checklists are moved here from AGENT-NEXT-STEPS.md -->
-<!-- Format per sprint: -->
-<!--
-### Sprint N - {SPRINT_NAME} ({YYYY-MM-DD})
+### Sprint 1 - AUTH, CAT, CART (2026-11-20)
 
-**Submodules**: {list}
-**TCs automated**: {N} P0 + {M} P1
-**Execution report**: `qa/05-test-execution/automated/{date-slug}.md`
+**Submodules**: AUTH (LOGIN, SES), CAT (SHOP, LIST, DETAIL, BADGE), CART (GEST, CHK)
+**TCs automated**: 119 (22 P0 + 48 P1 + 39 P2 + 10 P3); 113 pasan, 6 `test.fail()` sobre DEF-DEMO-FRAMEWORK-001..005
+**Execution report**: `qa/05-test-execution/Informe-de-Ejecucion-de-Pruebas-demo-framework-Sprint-1.md` (PDF en `qa/09-reports/`)
 
 Checklist (completed):
-- [x] {Task 1}
-- [x] {Task 2}
--->
-
-_No sprints completed yet._
+- [x] Instalación y configuración del framework (pasos de `AGENT-NEXT-STEPS.md`; sin integración ADO)
+- [x] Etapas 1-2: análisis y especificaciones de 3 módulos y 8 submódulos
+- [x] Etapas 3-4: Plan de Pruebas (119 TCs) e Informe de Análisis
+- [x] Registro de 5 defectos (`qa/06-defects/open/`) y 17 recomendaciones (`qa/06-defects/recommendations/`)
+- [x] Etapa 5: suite Playwright con los 119 TCs
+- [x] Etapa 5b: estabilización (TC-AUTH-LOGIN-014 corregido en el test; sin defectos nuevos)
+- [x] Informes finales en PDF (`qa/09-reports/`)
 
 ---
 
@@ -145,4 +149,4 @@ _No sprints completed yet._
 | Naming Conventions | `qa/00-standards/naming-conventions.md` |
 | Memory Index | `qa/memory/INDEX.md` |
 | Agent Next Steps | `qa/AGENT-NEXT-STEPS.md` |
-| Automation Config | `qa/07-automation/playwright.config.ts` |
+| Automation Config | `qa/07-automation/e2e/playwright.config.ts` |

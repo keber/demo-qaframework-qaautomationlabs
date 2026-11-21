@@ -1,5 +1,9 @@
 # demo-qaframework-qaautomationlabs
 
+[![E2E Playwright](https://github.com/keber/demo-qaframework-qaautomationlabs/actions/workflows/e2e.yml/badge.svg)](https://github.com/keber/demo-qaframework-qaautomationlabs/actions/workflows/e2e.yml)
+
+**Reporte Playwright en vivo:** https://keber.dev/demo-qaframework-qaautomationlabs/ (última ejecución del workflow de GitHub Actions)
+
 Demostración de las capacidades de [`@keber/qa-framework`](https://www.npmjs.com/package/@keber/qa-framework) aplicado con **Claude Code** sobre la tienda demo [shop.qaautomationlabs.com](https://shop.qaautomationlabs.com/shop.php).
 
 Todo el contenido de este repositorio (configuración del framework, especificaciones, plan de pruebas, automatización E2E con Playwright, estabilización, defectos, recomendaciones e informes finales en PDF) fue generado por Claude a partir de **un único prompt**. No hubo edición manual de los artefactos.
@@ -100,9 +104,27 @@ Los PDF están en [`qa/09-reports/`](qa/09-reports/).
 | `qa/07-automation/e2e/` | Proyecto Playwright: tests, page objects, fixtures |
 | `qa/09-reports/` | Informes finales en PDF |
 | `qa/memory/` | Aprendizajes registrados por los agentes |
+| `.github/workflows/e2e.yml` | Workflow de GitHub Actions que ejecuta la suite y publica el reporte |
+| `docs/snapshots/` | Capturas de los informes PDF usadas en este README |
 | `.claude/`, `.github/` | Reglas, comandos y skills del framework para agentes |
 
 ## Ejecutar las pruebas
+
+### En GitHub Actions (bajo demanda)
+
+El workflow [`e2e.yml`](.github/workflows/e2e.yml) se ejecuta manualmente desde **Actions > E2E Playwright (on demand) > Run workflow** (parámetro opcional `workers`, 1 a 8). También puede lanzarse con:
+
+```bash
+gh workflow run e2e.yml -R keber/demo-qaframework-qaautomationlabs -f workers=4
+```
+
+El workflow instala Playwright, ejecuta la suite completa, guarda el reporte como artifact (14 días) y lo publica en la rama dedicada `gh-pages`, que GitHub Pages sirve en el [reporte en vivo](https://keber.dev/demo-qaframework-qaautomationlabs/). La rama `gh-pages` contiene solo el último reporte y se reemplaza en cada ejecución.
+
+Las credenciales de la cuenta demo se leen desde los secrets del repositorio `QA_USER_EMAIL` y `QA_USER_PASSWORD`.
+
+> En el reporte de Playwright, los 6 casos marcados con `test.fail()` por defectos abiertos aparecen como "Passed": fallaron como se esperaba. Por eso el reporte muestra 119 pasados, que equivalen a 113 pasados más 6 fallos esperados.
+
+### En local
 
 Requisitos: Node.js 18 o superior.
 

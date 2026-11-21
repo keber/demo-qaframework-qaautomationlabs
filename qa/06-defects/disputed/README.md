@@ -6,3 +6,5 @@ development team disputes whether the observed behavior is actually a defect.
 A defect stays here while the functional decision is pending. Once the team reaches
 a formal conclusion, move the file to open/ (confirmed defect) or resolved/ (accepted
 behavior or won't fix).
+
+> demo-framework: sin defectos en disputa al cierre del Sprint 1 (2026-11-20).

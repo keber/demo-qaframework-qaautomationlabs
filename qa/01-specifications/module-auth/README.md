@@ -5,7 +5,7 @@
 | Código de módulo | AUTH |
 | URL principal | {{QA_BASE_URL}}/index.php |
 | Estado | Activo |
-| Etapas completadas | Etapa 1 (análisis de módulo) y Etapa 2 (generación de especificaciones) |
+| Etapas completadas | Etapas 1 a 5b (Sprint 1): especificaciones, plan, 31 TCs automatizados y estabilizados (29 pasan, 2 `test.fail()` sobre DEF-DEMO-FRAMEWORK-001 y 002) |
 | Última actualización | 2026-11-20 |
 
 ## Alcance
@@ -37,18 +37,19 @@ las pruebas (estado de sesión = `storageState` de `localStorage`, sin cookies).
 
 ## Anomalías observadas (2026-11-20)
 
-| ID provisional | Severidad sugerida | Clasificación | Descripción | RN / TC relacionado |
-|----------------|--------------------|---------------|-------------|---------------------|
-| ANOM-AUTH-01 | Alta | Candidato a DEF | El guard acepta **cualquier** valor no vacío de `isLoggedIn`: con `localStorage.isLoggedIn = "false"` se accede a `shop.php` sin haber iniciado sesión. | RN-AUTH-015 / TC-AUTH-SES-010 |
-| ANOM-AUTH-02 | Alta | Candidato a DEF | Las páginas protegidas responden HTTP 200 con el contenido completo a clientes sin sesión; la protección es solo una redirección JavaScript al final del `<body>` (con JavaScript deshabilitado, `shop.php` muestra las 4 tarjetas de categoría y el botón de logout). | RN-AUTH-015 / TC-AUTH-SES-011 |
-| ANOM-AUTH-03 | Media | Recomendación (REC) | Las credenciales de la cuenta demo están embebidas en el JavaScript público y las contraseñas de usuarios registrados se guardan en texto plano en `localStorage.users`. Aceptable para una tienda demo, no para producción. | RN-AUTH-006, RN-AUTH-013 |
-| ANOM-AUTH-04 | Baja | Recomendación (REC) | Presionar Enter en el campo de contraseña no envía el formulario (el botón no está dentro de un `<form>`); solo el clic en "Login" inicia sesión. | FL-AUTH-001 |
-| ANOM-AUTH-05 | Baja | Recomendación (REC) | Con "Remember me" marcado, el email se guarda en `localStorage.rememberedEmail` aunque el login falle (validación o credenciales incorrectas). | RN-AUTH-010 |
-| ANOM-AUTH-06 | Baja | Recomendación (REC) | Un usuario con sesión activa que visita `index.php` ve nuevamente el formulario de login (no se redirige a `shop.php`) y el encabezado oculta el botón de logout y el carrito. | RN-AUTH-017 |
-| ANOM-AUTH-07 | Baja | Recomendación (REC) | La comparación de email distingue mayúsculas y minúsculas (`DEMO@DEMO.COM` es rechazado). | RN-AUTH-006 / TC-AUTH-LOGIN-009 |
+| ID provisional | Severidad sugerida | Registro final | Descripción | RN / TC relacionado |
+|----------------|--------------------|----------------|-------------|---------------------|
+| ANOM-AUTH-01 | Alta | DEF-DEMO-FRAMEWORK-001 | El guard acepta **cualquier** valor no vacío de `isLoggedIn`: con `localStorage.isLoggedIn = "false"` se accede a `shop.php` sin haber iniciado sesión. | RN-AUTH-015 / TC-AUTH-SES-010 |
+| ANOM-AUTH-02 | Alta | DEF-DEMO-FRAMEWORK-002 | Las páginas protegidas responden HTTP 200 con el contenido completo a clientes sin sesión; la protección es solo una redirección JavaScript al final del `<body>` (con JavaScript deshabilitado, `shop.php` muestra las 4 tarjetas de categoría y el botón de logout). | RN-AUTH-015 / TC-AUTH-SES-011 |
+| ANOM-AUTH-03 | Media | REC-DEMO-FRAMEWORK-001 | Las credenciales de la cuenta demo están embebidas en el JavaScript público y las contraseñas de usuarios registrados se guardan en texto plano en `localStorage.users`. Aceptable para una tienda demo, no para producción. | RN-AUTH-006, RN-AUTH-013 |
+| ANOM-AUTH-04 | Baja | REC-DEMO-FRAMEWORK-002 | Presionar Enter en el campo de contraseña no envía el formulario (el botón no está dentro de un `<form>`); solo el clic en "Login" inicia sesión. | FL-AUTH-001 |
+| ANOM-AUTH-05 | Baja | REC-DEMO-FRAMEWORK-003 | Con "Remember me" marcado, el email se guarda en `localStorage.rememberedEmail` aunque el login falle (validación o credenciales incorrectas). | RN-AUTH-010 |
+| ANOM-AUTH-06 | Baja | REC-DEMO-FRAMEWORK-004 | Un usuario con sesión activa que visita `index.php` ve nuevamente el formulario de login (no se redirige a `shop.php`) y el encabezado oculta el botón de logout y el carrito. | RN-AUTH-017 |
+| ANOM-AUTH-07 | Baja | REC-DEMO-FRAMEWORK-005 | La comparación de email distingue mayúsculas y minúsculas (`DEMO@DEMO.COM` es rechazado). | RN-AUTH-006 / TC-AUTH-LOGIN-009 |
 
-> Los IDs `ANOM-AUTH-*` son provisionales. La creación de archivos `DEF-*` / `REC-*` en `qa/06-defects/`
-> queda pendiente para la etapa correspondiente; ningún TC usará `test.fail()` sin su archivo DEF.
+> Los IDs `ANOM-AUTH-*` fueron provisionales; la columna "Registro final" indica el archivo creado en
+> `qa/06-defects/open/` (DEF) o `qa/06-defects/recommendations/` (REC). Solo los DEF justifican
+> `test.fail()` (TC-AUTH-SES-010 y TC-AUTH-SES-011).
 
 ## Nota para automatización
 

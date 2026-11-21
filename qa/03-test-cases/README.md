@@ -9,3 +9,6 @@
 > - Required as standalone documents for audit or external review
 >
 > Naming: `TC-{MODULE}-{SUBMODULE}-{NNN}-{slug}.md`
+
+> demo-framework: no se usan casos de prueba independientes. Los 119 TCs del Sprint 1 están en
+> `qa/02-test-plans/sprints/Sprint-1/Plan-de-Pruebas-demo-framework-Sprint-1-AUTH-CAT-CART.md`.

@@ -1,5 +1,8 @@
 # API Integration Tests
 
+> demo-framework: este andamiaje no se usa. La aplicación bajo prueba no expone una API (todo ocurre en
+> el navegador sobre `localStorage`), por lo que solo existe la suite E2E de `qa/07-automation/e2e/`.
+
 Playwright-based API test project for `qa/07-automation/integration/`. No browser:
 tests call HTTP endpoints through Playwright's `APIRequestContext`.
 

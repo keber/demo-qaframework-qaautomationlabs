@@ -5,7 +5,7 @@
 | Código de módulo | CAT |
 | URL base | https://shop.qaautomationlabs.com |
 | Páginas | `shop.php`, `mens-wear.php`, `womens-wear.php`, `kids-wear.php`, `electronics.php`, `product.php?id={id}` |
-| Etapa del pipeline | 1 (análisis) y 2 (especificación) completadas |
+| Etapa del pipeline | Etapas 1 a 5b completadas (Sprint 1): 50 TCs automatizados y estabilizados, 50 pasan |
 | Última actualización | 2026-11-20 |
 | Fuente de verdad | UI observada con Playwright (chromium) en esta sesión |
 
@@ -43,22 +43,23 @@ pertenecen al módulo CART; el login y el logout pertenecen al módulo AUTH.
 
 ## Hallazgos y anomalías observadas (2026-11-20)
 
-Candidatos a registrar en `qa/06-defects/` (no se crearon archivos fuera de este módulo). La
-clasificación DEF/REC es propuesta y debe confirmarla el responsable de QA según la regla 8 del framework.
+La columna "Clasificación sugerida" es la propuesta original de la Etapa 1. La clasificación final
+(regla 8 del framework) está en "Registro final": H-CAT-01 y H-CAT-03 se propusieron como DEF y
+quedaron como REC por no violar ninguna regla de negocio; H-CAT-07 quedó como DEF.
 
-| ID propuesto | Hallazgo | Evidencia | Clasificación sugerida |
-|---|---|---|---|
-| H-CAT-01 | Error JS no controlado `loadProducts is not defined` al cargar las 4 páginas de categoría | `pageerror` en Playwright; la función no existe en `products.js`, `main.js` ni `qalabs-enhance.js` | DEF (técnico, sin impacto funcional visible) |
-| H-CAT-02 | Error JS `$(...).owlCarousel is not a function` en `shop.php`, `product.php` y otras páginas | `pageerror` en Playwright | REC |
-| H-CAT-03 | El enlace "Home" del breadcrumb en categoría y detalle apunta a `/`, que muestra el formulario de login aunque la sesión esté activa; en `shop.php` "Home" apunta a `#` | Navegación observada | DEF candidato (navegación inconsistente) |
-| H-CAT-04 | El badge cuenta líneas distintas y no unidades: agregar 2 veces el mismo producto deja el badge en 1 (`qty: 2`) | `localStorage.cart` y badge observados | REC (pendiente confirmación de negocio) |
-| H-CAT-05 | El badge no se sincroniza entre pestañas hasta recargar | Dos pestañas en el mismo contexto | REC |
-| H-CAT-06 | El carrito persiste en `localStorage` tras el logout y no está asociado al usuario | `localStorage` después de logout | REC (privacidad en equipos compartidos) |
-| H-CAT-07 | Control de acceso solo en el cliente: el servidor entrega el HTML sin sesión y cualquier valor no vacío de `isLoggedIn` (incluso `"false"`) habilita el acceso | `curl` HTTP 200; prueba con `isLoggedIn="false"` | REC de seguridad (derivar al proceso formal de ciberseguridad) |
-| H-CAT-08 | Productos de color Yellow (id 8 "Frock" de Women, id 49 "Sharara" de Kids) no tienen opción de filtro de color y quedan excluidos al marcar cualquier color | `products.js` + filtros observados | REC |
-| H-CAT-09 | En Electronics la línea "Model: {marca}" no tiene `data-testid` y el filtro de marca reutiliza la clase/id `size` | HTML observado | REC (testabilidad) |
-| H-CAT-10 | "Add to Cart" no da retroalimentación visual (sin toast, alerta ni cambio de texto); solo cambia el badge | Observado | REC (usabilidad) |
+| ID propuesto | Hallazgo | Evidencia | Clasificación sugerida | Registro final |
+|---|---|---|---|---|
+| H-CAT-01 | Error JS no controlado `loadProducts is not defined` al cargar las 4 páginas de categoría | `pageerror` en Playwright; la función no existe en `products.js`, `main.js` ni `qalabs-enhance.js` | DEF (técnico, sin impacto funcional visible) | REC-DEMO-FRAMEWORK-006 |
+| H-CAT-02 | Error JS `$(...).owlCarousel is not a function` en `shop.php`, `product.php` y otras páginas | `pageerror` en Playwright | REC | REC-DEMO-FRAMEWORK-006 |
+| H-CAT-03 | El enlace "Home" del breadcrumb en categoría y detalle apunta a `/`, que muestra el formulario de login aunque la sesión esté activa; en `shop.php` "Home" apunta a `#` | Navegación observada | DEF candidato (navegación inconsistente) | REC-DEMO-FRAMEWORK-004 |
+| H-CAT-04 | El badge cuenta líneas distintas y no unidades: agregar 2 veces el mismo producto deja el badge en 1 (`qty: 2`) | `localStorage.cart` y badge observados | REC (pendiente confirmación de negocio) | REC-DEMO-FRAMEWORK-007 |
+| H-CAT-05 | El badge no se sincroniza entre pestañas hasta recargar | Dos pestañas en el mismo contexto | REC | REC-DEMO-FRAMEWORK-008 |
+| H-CAT-06 | El carrito persiste en `localStorage` tras el logout y no está asociado al usuario | `localStorage` después de logout | REC (privacidad en equipos compartidos) | REC-DEMO-FRAMEWORK-009 |
+| H-CAT-07 | Control de acceso solo en el cliente: el servidor entrega el HTML sin sesión y cualquier valor no vacío de `isLoggedIn` (incluso `"false"`) habilita el acceso | `curl` HTTP 200; prueba con `isLoggedIn="false"` | REC de seguridad (derivar al proceso formal de ciberseguridad) | DEF-DEMO-FRAMEWORK-001, DEF-DEMO-FRAMEWORK-002 |
+| H-CAT-08 | Productos de color Yellow (id 8 "Frock" de Women, id 49 "Sharara" de Kids) no tienen opción de filtro de color y quedan excluidos al marcar cualquier color | `products.js` + filtros observados | REC | REC-DEMO-FRAMEWORK-010 |
+| H-CAT-09 | En Electronics la línea "Model: {marca}" no tiene `data-testid` y el filtro de marca reutiliza la clase/id `size` | HTML observado | REC (testabilidad) | REC-DEMO-FRAMEWORK-011 |
+| H-CAT-10 | "Add to Cart" no da retroalimentación visual (sin toast, alerta ni cambio de texto); solo cambia el badge | Observado | REC (usabilidad) | REC-DEMO-FRAMEWORK-012 |
 
-## Siguiente etapa
+## Estado
 
-Etapa 3 - Plan de pruebas (`/qa-test-plan`).
+Sprint 1 cerrado (2026-11-20). Plan, ejecución y defectos: ver `qa/README.md`.

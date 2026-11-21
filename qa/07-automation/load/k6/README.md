@@ -1,5 +1,8 @@
 # k6 performance tests
 
+> demo-framework: las pruebas de rendimiento con k6 no se usan en este proyecto. Este README es la
+> documentación genérica del framework.
+
 Targeted performance runs against one or a handful of named API endpoints:
 single-endpoint timing, or baseline vs candidate (V1 vs V2, before vs after a fix)
 under concurrent load. Read `.github/skills/qa-performance-k6/SKILL.md` before
