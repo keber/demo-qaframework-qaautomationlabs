@@ -52,6 +52,11 @@ jobs:
           npm ci
           npx playwright install --with-deps chromium
 
+      # The repo versions the report of the last local run. Remove it so a run that
+      # produces no report can never publish that stale one as if it were current.
+      - name: Remove committed report
+        run: rm -rf "$REPORT_DIR" qa/05-test-execution/automated/results.json
+
       - name: Run Playwright suite
         id: tests
         continue-on-error: true

@@ -160,7 +160,7 @@ async function loginAs(params: {
     let signedIn = false;
 
     for (let attempt = 1; attempt <= 3 && !signedIn; attempt++) {
-      await page.goto(loginUrl, { waitUntil: 'load', timeout: 60_000 });
+      await page.goto(loginUrl, { waitUntil: 'domcontentloaded', timeout: 60_000 });
       await page.locator(emailSelector).fill(email);
       // Trace safety: Playwright records fill() argument values in traces, and this
       // project runs with trace/video 'retain-on-failure' - a failed CI run would

@@ -61,7 +61,7 @@ async function reauth(browser: import('@playwright/test').Browser, stateFile: st
   const page = await context.newPage();
 
   try {
-    await page.goto(loginPath, { waitUntil: 'load', timeout: 60_000 });
+    await page.goto(loginPath, { waitUntil: 'domcontentloaded', timeout: 60_000 });
     await page.locator(emailSelector).fill(email);
     // Trace safety: Playwright records fill() argument values in traces, and this
     // project runs with trace/video 'retain-on-failure'. This reauth path runs for
